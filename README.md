@@ -1,3 +1,5 @@
 # 4A_SQR_CI_CD
 
-README
+KAMLI Younes et LE THIES Loann - SQR1
+
+
