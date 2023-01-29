@@ -1,6 +1,8 @@
 from flask import Flask, request
 from Personne import Personne
 from operator import itemgetter
+import csv
+import os
 import sys
 
 app = Flask(__name__)
@@ -13,6 +15,9 @@ P2 = Personne(2, "Loann", "LE THIES", 50)
 listPersonne.append(P2)
 P3 = Personne(3, "Naofel", "EL ALOUANI", 50)
 listPersonne.append(P3)
+
+#url = "transaction.csv"
+#texte = pd.read_csv(url)
 
 #Affiche le tuple sous la forme d'un string
 def tuple_display(tuple: tuple):
@@ -87,6 +92,25 @@ def getSolde():
             
     return solde_personne
 
+@app.route('/csv', methods=['POST', 'GET'])
+def getcsv():
+    tuplet = ("", "", "", "")
+    if request.method == "POST":
+        if request.files:
+            f = request.files['file']
+            chemin = os.path.join(app.config['FILE_UPLOADS'], f.filename)
+            f.save(chemin)
+
+            with open(chemin) as file:
+                cr = csv.reader(file)
+                for row in cr:
+                    tuplet = (int(row[0]), int(row[1]), int(row[2]), int(row[3]))
+                    print("oui")
+                listTransac.append(tuplet)
+        else:
+            print("Ca marche pas")
+    return display_list(listTransac)
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == "check_syntax":
@@ -98,4 +122,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 #curl -X POST -d "personne1=1&personne2=2&temps=10&somme=50" http://localhost:5000/transaction
-#
+#curl -X POST -F 'file=@transaction.csv' http://localhost:5000/csv
