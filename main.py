@@ -7,7 +7,7 @@ import sys
 
 app = Flask(__name__)
  
-listTransac = [(1, 2, 5, 10), (1, 3, 30, 15), (2, 3, 10, 11)]
+listTransac = [(1, 2, 6, 11), (1, 3, 3, 1), (2, 3, 16, 19)]
 listPersonne = []
 P1 = Personne(1, "Younes", "KAMLI", 50)
 listPersonne.append(P1)
@@ -95,22 +95,46 @@ def getSolde():
 @app.route('/csv', methods=['POST', 'GET'])
 def getcsv():
     tuplet = ("", "", "", "")
+    P1 = 0
+    P2 = 0
+    t = 0
+    s = 0
+    compteur = 0
     if request.method == "POST":
         if request.files:
             f = request.files['file']
-            chemin = os.path.join(app.config['FILE_UPLOADS'], f.filename)
+            chemin = os.path.join(f.filename)
             f.save(chemin)
 
             with open(chemin) as file:
-                cr = csv.reader(file)
+                cr = csv.reader(file, delimiter=';')
                 for row in cr:
-                    tuplet = (int(row[0]), int(row[1]), int(row[2]), int(row[3]))
-                    print("oui")
-                listTransac.append(tuplet)
+                    if compteur != 0:
+                        P1 = int(row[0])
+                        P2 = int(row[1])
+                        t = int(row[2])
+                        s = int(row[3])
+                        tuplet = (P1, P2, t, s)
+                        listTransac.append(tuplet)
+                    compteur += 1
         else:
             print("Ca marche pas")
     return display_list(listTransac)
 
+    '''tuplet = ("", "", "", "")
+    if request.method == "POST":
+        if request.files:
+            f = request.files['file']
+
+        with open('transaction.csv') as fichier_csv:
+            lecteur_csv = csv.reader(fichier_csv)
+            for ligne in lecteur_csv:
+                if(ligne[0] != "Donneur"):
+                    tuplet = (int(ligne[0]), int(ligne[1]), int(ligne[2]), int(ligne[3]))
+                    listTransac.append(tuplet)
+    return  display_list(listTransac)'''
+
+#Check_syntax
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == "check_syntax":
