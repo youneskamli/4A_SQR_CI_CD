@@ -12,14 +12,14 @@ app = Flask(__name__)
 listPersonne = []
 P1 = Personne(1, "Younes", "KAMLI", 50)
 listPersonne.append(P1)
-P2 = Personne(2, "Loann", "LE THIES", 50)
+P2 = Personne(2, "Loann", "LE THIES", 60)
 listPersonne.append(P2)
-P3 = Personne(3, "Naofel", "EL ALOUANI", 50)
+P3 = Personne(3, "Naofel", "EL ALOUANI", 70)
 listPersonne.append(P3)
 
 #Fonction donnant le hash sha256
-def getHash(P1 : str, P2 : str, s : str):
-    input_string = P1 + P2 + s
+def getHash(P1 : str, P2 : str, s : str, t : str):
+    input_string = P1 + P2 + s + t
     sha256 = hashlib.sha256()
     sha256.update(input_string.encode())
     return sha256.hexdigest()
@@ -35,7 +35,7 @@ def getNameById(id : int):
     return nom + " " + prenom + " "
 
 #Ajout d'une liste de transactions avec des transactions par défaut
-listTransac = [(1, 2, 6, 11, getHash(str(1), str(2), str(11))), (1, 3, 3, 1, getHash(str(1), str(3), str(1))), (2, 3, 16, 19, getHash(str(2), str(3), str(19)))]
+listTransac = [(1, 2, 6, 11, getHash(str(1), str(2), str(11), str(6))), (1, 3, 3, 1, getHash(str(1), str(3), str(1), str(3))), (2, 3, 16, 19, getHash(str(2), str(3), str(19), str(16)))]
 
 #Affiche le tuple sous la forme d'un string
 def tuple_display(tuple: tuple):
@@ -81,7 +81,7 @@ def display():
         personne2 = int(request.form.get("personne2"))
         temps = int(request.form.get("temps"))
         somme = int(request.form.get("somme"))
-        hash = getHash(str(personne1), str(personne2), str(somme))
+        hash = getHash(str(personne1), str(personne2), str(somme), str(temps))
         tuplet = (personne1, personne2, temps, somme, hash)
         listTransac.append(tuplet)
 
@@ -134,7 +134,7 @@ def getcsv():
                         P2 = int(row[1])
                         t = int(row[2])
                         s = int(row[3])
-                        tuplet = (P1, P2, t, s, getHash(str(P1), str(P2), str(s)))
+                        tuplet = (P1, P2, t, s, getHash(str(P1), str(P2), str(s), str(t)))
                         listTransac.append(tuplet)
                     compteur += 1
         else:
@@ -150,7 +150,7 @@ def integrity():
         temps = request.form.get("temps")
         somme = request.form.get("somme")
         for transaction in listTransac:
-            if(getHash(personne1, personne2, somme) == getHash(str(transaction[0]), str(transaction[1]), str(transaction[3]))):
+            if(getHash(personne1, personne2, somme, temps) == getHash(str(transaction[0]), str(transaction[1]), str(transaction[3]), str(transaction[2]))):
                 return "<p> La transaction existe </p> \n"
         return "<p> La transaction n'existe pas </p> \n"
     return "<p> En attente d'une transaction... </p> \n"
