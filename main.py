@@ -8,6 +8,7 @@ import hashlib
 
 app = Flask(__name__)
 
+#Declaration d'une liste de personnes que qui stocjera des objets de type Personne 
 listPersonne = []
 P1 = Personne(1, "Younes", "KAMLI", 50)
 listPersonne.append(P1)
@@ -16,13 +17,14 @@ listPersonne.append(P2)
 P3 = Personne(3, "Naofel", "EL ALOUANI", 50)
 listPersonne.append(P3)
 
-#Donne le hash
+#Fonction donnant le hash sha256
 def getHash(P1 : str, P2 : str, s : str):
     input_string = P1 + P2 + s
     sha256 = hashlib.sha256()
     sha256.update(input_string.encode())
     return sha256.hexdigest()
 
+#Fonction permmettant de retrouver le nom et prénom d'une personne depuis son id
 def getNameById(id : int):
     nom = ""
     prenom = ""
@@ -30,8 +32,9 @@ def getNameById(id : int):
         if element.id == id :
             nom = element.lastName
             prenom = element.firstName
-    return nom+ " " + prenom + " "
+    return nom + " " + prenom + " "
 
+#Ajout d'une liste de transactions avec des transactions par défaut
 listTransac = [(1, 2, 6, 11, getHash(str(1), str(2), str(11))), (1, 3, 3, 1, getHash(str(1), str(3), str(1))), (2, 3, 16, 19, getHash(str(2), str(3), str(19)))]
 
 #Affiche le tuple sous la forme d'un string
@@ -39,7 +42,7 @@ def tuple_display(tuple: tuple):
     string = str(getNameById(tuple[0])) + " a donné " + str(tuple[3]) + " euros à " + getNameById(tuple[1]) + " à " + str(tuple[2]) + " heures. Le hash correspondant est : " + str(tuple[4])
     return string
 
-#Affiche une liste de tuple sous la fomre d'un string
+#Affiche une liste de tuple sous la forme d'un string
 def display_list(list: list):
     string = ""
     list = sort_list(list)
@@ -47,7 +50,7 @@ def display_list(list: list):
         string += "<p>" + tuple_display(element) + "</p> \n"
     return string
 
-#Trie une liste de tuple selon leur date (3eme element du tuple)
+#Trier une liste de tuple selon leur date (3eme element du tuple)
 def sort_list(list: list):
     list = sorted(list, key=itemgetter(2))
     return list
@@ -95,9 +98,9 @@ def getTransaction():
     for element in listTransac:
         if element[0] == personne or element[1] == personne:
             listTransacPersonne.append(element)
-            
     return display_list(listTransacPersonne)
 
+#Route pour E4
 @app.route('/solde', methods=['GET'])
 def getSolde():
     solde_personne = ""
@@ -108,6 +111,7 @@ def getSolde():
             
     return solde_personne
 
+#Route pour E5
 @app.route('/csv', methods=['POST', 'GET'])
 def getcsv():
     tuplet = ("", "", "", "")
@@ -137,6 +141,20 @@ def getcsv():
             print("Error")
     return display_list(listTransac)
 
+#Checker si une transaction existe déjà ou non
+@app.route('/integrity', methods=['POST', 'GET'])
+def integrity():
+    if request.method == "POST":
+        personne1 = request.form.get("personne1")
+        personne2 = request.form.get("personne2")
+        temps = request.form.get("temps")
+        somme = request.form.get("somme")
+        for transaction in listTransac:
+            if(getHash(personne1, personne2, somme) == getHash(str(transaction[0]), str(transaction[1]), str(transaction[3]))):
+                return "<p> La transaction existe </p> \n"
+        return "<p> La transaction n'existe pas </p> \n"
+    return "<p> En attente d'une transaction... </p> \n"
+
 #Check_syntax
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -148,5 +166,9 @@ if __name__ == '__main__':
             exit(1)
     app.run(debug=True)
 
+#Liste des commandes (resp E1/E2, E3, E4, E5, integrite)
 #curl -X POST -d "personne1=1&personne2=2&temps=10&somme=50" http://localhost:5000/transaction
+#http://localhost:5000/personne?personne=<id>
+#http://localhost:5000/solde?personne=<id>
 #curl -X POST -F 'file=@transaction.csv' http://localhost:5000/csv
+#curl -X POST -d "personne1=1&personne2=2&temps=10&somme=50" http://localhost:5000/integrity
