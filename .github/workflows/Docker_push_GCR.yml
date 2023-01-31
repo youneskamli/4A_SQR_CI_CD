@@ -33,7 +33,7 @@ jobs:
         with:
           # Emplacement du Dockerfile
           file: ./Dockerfile
-          tags: gcr.io/esirem/4A_sqr/kamli_lethies/cicd:${{ github.ref_name }}
+          tags: gcr.io/esirem/4a_sqr/kamli_lethies/cicd:${{ github.ref_name }}
           # Emplacement des fichiers 
           context: .
           push: true
