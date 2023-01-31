@@ -4,10 +4,10 @@ from operator import itemgetter
 import csv
 import os
 import sys
+import hashlib
 
 app = Flask(__name__)
- 
-listTransac = [(1, 2, 6, 11), (1, 3, 3, 1), (2, 3, 16, 19)]
+
 listPersonne = []
 P1 = Personne(1, "Younes", "KAMLI", 50)
 listPersonne.append(P1)
@@ -16,12 +16,27 @@ listPersonne.append(P2)
 P3 = Personne(3, "Naofel", "EL ALOUANI", 50)
 listPersonne.append(P3)
 
-#url = "transaction.csv"
-#texte = pd.read_csv(url)
+#Donne le hash
+def getHash(P1 : str, P2 : str, s : str):
+    input_string = P1 + P2 + s
+    sha256 = hashlib.sha256()
+    sha256.update(input_string.encode())
+    return sha256.hexdigest()
+
+def getNameById(id : int):
+    nom = ""
+    prenom = ""
+    for element in listPersonne:
+        if element.id == id :
+            nom = element.lastName
+            prenom = element.firstName
+    return nom+ " " + prenom + " "
+
+listTransac = [(1, 2, 6, 11, getHash(str(1), str(2), str(11))), (1, 3, 3, 1, getHash(str(1), str(3), str(1))), (2, 3, 16, 19, getHash(str(2), str(3), str(19)))]
 
 #Affiche le tuple sous la forme d'un string
 def tuple_display(tuple: tuple):
-    string = str(tuple[0]) + " a donné " + str(tuple[3]) + " euros à " + str(tuple[1]) + " à " + str(tuple[2]) + " heures"
+    string = str(getNameById(tuple[0])) + " a donné " + str(tuple[3]) + " euros à " + getNameById(tuple[1]) + " à " + str(tuple[2]) + " heures. Le hash correspondant est : " + str(tuple[4])
     return string
 
 #Affiche une liste de tuple sous la fomre d'un string
@@ -63,7 +78,8 @@ def display():
         personne2 = int(request.form.get("personne2"))
         temps = int(request.form.get("temps"))
         somme = int(request.form.get("somme"))
-        tuplet = (personne1, personne2, temps, somme)
+        hash = getHash(str(personne1), str(personne2), str(somme))
+        tuplet = (personne1, personne2, temps, somme, hash)
         listTransac.append(tuplet)
 
         donate(personne1, somme)
@@ -114,25 +130,12 @@ def getcsv():
                         P2 = int(row[1])
                         t = int(row[2])
                         s = int(row[3])
-                        tuplet = (P1, P2, t, s)
+                        tuplet = (P1, P2, t, s, getHash(str(P1), str(P2), str(s)))
                         listTransac.append(tuplet)
                     compteur += 1
         else:
-            print("Ca marche pas")
+            print("Error")
     return display_list(listTransac)
-
-    '''tuplet = ("", "", "", "")
-    if request.method == "POST":
-        if request.files:
-            f = request.files['file']
-
-        with open('transaction.csv') as fichier_csv:
-            lecteur_csv = csv.reader(fichier_csv)
-            for ligne in lecteur_csv:
-                if(ligne[0] != "Donneur"):
-                    tuplet = (int(ligne[0]), int(ligne[1]), int(ligne[2]), int(ligne[3]))
-                    listTransac.append(tuplet)
-    return  display_list(listTransac)'''
 
 #Check_syntax
 if __name__ == '__main__':
