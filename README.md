@@ -1,9 +1,8 @@
 # 4A_SQR_CI_CD
 
 
-<p align="center">
-  <img src="http://www.u-bourgogne.fr/wp-content/uploads/logo-couleur.jpg" width="50%" height="50%" />
-</p>
+ <img src="http://www.u-bourgogne.fr/wp-content/uploads/logo-couleur.jpg" width="50%" height="50%" />
+
 
 KAMLI Younes et LE THIES Loann - SQR1
 
