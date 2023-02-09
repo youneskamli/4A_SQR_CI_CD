@@ -6,6 +6,8 @@
 
 KAMLI Younes et LE THIES Loann - SQR1
 
+[![](https://img.shields.io/badge/PROJET_TERMINÉ_🚀-059142?style=for-the-badge&logoColor=white)](https://dev.to/envoy_/150-badges-for-github-pnk)
+
 # Présentation du projet
 
 L'objectif de ce projet est de créer une API Flask pour de la gestion CRUD d’un système de transaction.
